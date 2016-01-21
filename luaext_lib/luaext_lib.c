@@ -1,0 +1,188 @@
+/*
+ * luaext_lib.c
+ * A C module with low-level functions for luaext
+ */
+#include "luaext_lib.h"
+
+#include "lauxlib.h"
+#include "luacompat.h"
+#include <string.h>
+
+static int STRING_FORMAT = LUA_NOREF; // references the string.format function
+
+/* General / "global" functions */
+
+// C-style printf, an equivalent to print(string.format(...))
+LUA_CFUNC(luaext_printf) {
+	int nargs = lua_gettop(L);
+	if (nargs > 0) {
+		lua_rawgeti(L, LUA_REGISTRYINDEX, STRING_FORMAT);
+		lua_insert(L, 1);
+		lua_call(L, nargs, 1);
+		lua_getglobal(L, "print");
+		lua_insert(L, 1);
+		lua_call(L, 1, 0);
+	} else {
+		lua_getglobal(L, "print");
+		lua_call(L, 0, 0);
+	}
+	return 0;
+}
+
+// tests for an 'empty' value at given stack index
+bool luaext_isEmpty(lua_State *L, int idx) {
+	LUA_CHECKIDX(L, idx);
+	if (lua_isnoneornil(L, idx)) return true; // (no value at index)
+
+	switch (lua_type(L, idx)) {
+	case LUA_TSTRING:
+		// a string is 'empty' if it has zero length (== "")
+		return lua_rawlen(L, idx) == 0;
+
+	case LUA_TTABLE:
+		LUA_ABSIDX(L, idx);
+		// we'll test if the table contains at least one element (index)
+		lua_pushnil(L);
+		if (lua_next(L, idx)) {
+			lua_pop(L, 2);
+			return false; // this is a non-empty table
+		}
+		return true; // empty table
+
+	case LUA_TLIGHTUSERDATA:
+	case LUA_TUSERDATA:
+		// test if it's a NULL pointer
+		return lua_touserdata(L, idx) == NULL;
+
+#ifdef LUA_TCDATA
+	case LUA_TCDATA:
+		/* LuaJIT <cdata> is a bit tricky. A first attempt to simply compare
+		 * the value to `nil` using lua_equal() FAILED.
+		 * According to http://comments.gmane.org/gmane.comp.lang.lua.luajit/4488
+		 * the Lua C API isn't guaranteed to fully interoperate with cdata.
+		 *
+		 * More or less the same applies to lua_topointer(), which won't produce
+		 * meaningful results for cdata pointer or array types (no dereferencing).
+		 *
+		 * So let's resort to a workaround instead: we'll do a Lua tostring()
+		 * conversion of the cdata, and check if that string contains "NULL".
+		 */
+		LUA_ABSIDX(L, idx);
+		lua_getglobal(L, "tostring");
+		lua_pushvalue(L, idx); // duplicate value
+		lua_call(L, 1, 1);
+		bool result = strstr(lua_tostring(L, -1), "NULL") != NULL;
+		lua_pop(L, 1);
+		return result;
+#endif
+	}
+	return false; // consider anything else a non-empty value
+}
+
+// test (each argument) for 'empty' Lua values, returns same number of results
+LUA_CFUNC(luaext_empty) {
+	int argc = lua_gettop(L); // number of arguments, stack "top"
+	int i = 1;
+	while (i <= argc) lua_pushboolean(L, luaext_isEmpty(L, i++));
+	return argc;
+}
+
+// helper function for cross_type_compare()
+int cross_type_ordering(int type) {
+	// (this determines precedence between different types)
+	switch (type) {
+	case LUA_TNIL: return 0;
+	case LUA_TNUMBER: return 1;
+	case LUA_TBOOLEAN: return 2;
+	case LUA_TSTRING: return 3;
+	case LUA_TTABLE: return 4;
+	}
+	return 5; // default, "other"
+}
+// "cross-type" comparison was inspired by https://github.com/bluebird75/luaunit/issues/29
+int cross_type_compare(lua_State *L, int index1, int index2) {
+	int order_1 = cross_type_ordering(lua_type(L, index1));
+	int order_2 = cross_type_ordering(lua_type(L, index2));
+	if (order_1 != order_2) {
+		// we have different types, so we base the "comparison" on their precedence
+		/* DEBUG only: print precedence
+		lua_getglobal(L, "print");
+		lua_pushliteral(L, "precedence:");
+		lua_pushinteger(L, order_1);
+		lua_pushinteger(L, order_2);
+		lua_call(L, 3, 0);
+		//*/
+		if (order_1 < order_2) return -1;
+		return 1;
+	}
+	if (order_1 == 1 || order_1 == 3) {
+		// number or string, we'll use the standard Lua comparison
+		if (lua_lessthan(L, index1, index2)) return -1;
+		if (lua_equal(L, index1, index2)) return 0;
+		return 1;
+	}
+	// Any other type(s) might not have a meaningful comparison / order.
+	// We'll use a workaround instead: convert both values to their tostring()
+	// representation, and compare that instead.
+	LUA_ABSIDX(L, index1);
+	LUA_ABSIDX(L, index2);
+	lua_getglobal(L, "tostring");
+	lua_pushvalue(L, index2);
+	lua_pushvalue(L, -2); // duplicate tostring() function
+	lua_pushvalue(L, index1);
+	lua_call(L, 1, 1); // tostring(value1)
+	lua_insert(L, -3);
+	lua_call(L, 1, 1); // tostring(value2)
+	/* DEBUG only: print both values
+	lua_getglobal(L, "print");
+	lua_pushvalue(L, -3);
+	lua_pushvalue(L, -3);
+	lua_call(L, 2, 0);
+	//*/
+	int result = 1;
+	if (lua_lessthan(L, -2, -1))
+		result = -1;
+	else
+		if (lua_equal(L, -2, -1)) result = 0;
+	lua_pop(L, 2);
+	return result;
+}
+
+// A Lua binding for cross_type_compare()
+LUA_CFUNC(luaext_crossTypeCompare) {
+	lua_settop(L, 2);
+	lua_pushinteger(L, cross_type_compare(L, 1, 2));
+	return 1;
+}
+// This function is intended to be used with table.sort()
+LUA_CFUNC(luaext_crossTypeSort) {
+	lua_settop(L, 2);
+	lua_pushboolean(L, cross_type_compare(L, 1, 2) < 0);
+	return 1;
+}
+
+/* Math */
+/* Strings */
+/* Tables */
+
+// the list of module functions to export
+static const luaL_Reg module_functions[] = {
+	{"crossTypeCompare", luaext_crossTypeCompare},
+	{"crossTypeSort", luaext_crossTypeSort},
+	{"empty", luaext_empty},
+	{"printf", luaext_printf},
+	{NULL, NULL}
+};
+
+LUA_CFUNC(luaopen_luaext_lib) {
+	// retrieve the string.format function and store a reference to it
+	lua_getglobal(L, "require");
+	lua_pushliteral(L, "string");
+	lua_call(L, 1, 1);
+	lua_pushliteral(L, "format");
+	lua_rawget(L, -2);
+	STRING_FORMAT = luaL_ref(L, LUA_REGISTRYINDEX);
+
+	luaL_newlib(L, module_functions);
+	return 1;
+}
