@@ -33,7 +33,7 @@ if _M._config.EXPORT_MODULE_AS_GLOBAL then
 end
 if _M._config.EXPORT_GLOBAL_FUNCTIONS then
 	-- export specific functions to the global namespace
-	for _, func in ipairs({"empty", "printf"}) do
+	for _, func in ipairs({"empty", "error_fmt", "printf"}) do
 		_G[func] = _M[func]
 	end
 end

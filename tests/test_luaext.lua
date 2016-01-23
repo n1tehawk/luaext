@@ -13,8 +13,39 @@ else
 	lu.assertFalse(ext._config.EXPORT_MODULE_AS_GLOBAL)
 end
 
+local function test_global(func_name)
+	if ext._config.EXPORT_GLOBAL_FUNCTIONS then
+		lu.assertEquals(rawget(_G, func_name), ext[func_name])
+	else
+		lu.assertNil(rawget(_G, func_name))
+	end
+end
 
 TestLuaExt = {} -- test class
+
+function TestLuaExt:test_errorfmt()
+	-- raise formatted error from within nested functions
+	local function bar(level)
+		ext.error_fmt(level, "hex=%X", 123)
+	end
+	local function foo(level)
+		bar(level)
+	end
+
+	local _, err = pcall(foo) -- default level 1 = error position in bar()
+	local line1 = err:match("test_luaext%.lua:(%d+): (.*)hex=7B$")
+	lu.assertNotNil(line1)
+	_, err = pcall(foo, 2) -- level 2 = error position within foo()
+	local line2 = err:match("test_luaext%.lua:(%d+): (.*)hex=7B$")
+	lu.assertNotNil(line2)
+	-- make sure that "line2" position is exactly 3 lines after "line1"
+	lu.assertEquals(tonumber(line2), tonumber(line1) + 3)
+
+	-- check that error_fmt gracefully handles missing (= default) level
+	lu.assertEquals({pcall(ext.error_fmt, "foo=%s", "bar")}, {false, "foo=bar"})
+
+	test_global("error_fmt")
+end
 
 function TestLuaExt:test_crossTypeCompare()
 	lu.assertEquals(ext.crossTypeCompare(true, "foo"), -1)
@@ -94,9 +125,5 @@ function TestLuaExt:test_empty()
 	lu.assertEquals({ext.empty(t, t[2], t[3], t[5])},
 					{false, true, false, true}) -- (no value at index 5)
 
-	if ext._config.EXPORT_GLOBAL_FUNCTIONS then
-		lu.assertEquals(rawget(_G, "empty"), ext.empty)
-	else
-		lu.assertNil(rawget(_G, "empty"))
-	end
+	test_global("empty")
 end

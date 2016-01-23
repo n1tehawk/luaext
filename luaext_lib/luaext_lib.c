@@ -30,6 +30,36 @@ LUA_CFUNC(luaext_printf) {
 	return 0;
 }
 
+// printf-style error:
+// error_fmt(level, fmt, ...) is equivalent to error(string.format(fmt, ...), level)
+// level is optional, with error_fmt(fmt, ...) implemented as error_fmt(1, fmt, ...)
+LUA_CFUNC(luaext_error_fmt) {
+	int level = 1; // default error level (report position within current chunk)
+	switch (lua_type(L, 1)) {
+	case LUA_TNUMBER:
+		level = luaL_checkinteger(L, 1);
+		if (level < 1) level = 1; // ignore level value if it's too small
+		break;
+	case LUA_TSTRING: // use default level, but (re)align message on Lua stack
+		lua_pushnil(L);
+		lua_insert(L, 1);
+		break;
+	}
+	luaL_checkstring(L, 2);
+
+	int nargs = lua_gettop(L) - 2;
+	// TODO: optimize for nargs == 0, by simply passing through message string ?
+	lua_rawgeti(L, LUA_REGISTRYINDEX, STRING_FORMAT);
+	lua_insert(L, 2); // move function before fmt string (plus any optional varargs)
+	lua_call(L, nargs + 1, 1);
+
+	lua_getglobal(L, "error");
+	lua_replace(L, 1);
+	lua_pushinteger(L, level + 1);
+	lua_call(L, 2, 0); // error(msg, level)
+	return 0; // (Note: actually this function doesn't ever return)
+}
+
 // tests for an 'empty' value at given stack index
 bool luaext_isEmpty(lua_State *L, int idx) {
 	LUA_CHECKIDX(L, idx);
@@ -344,6 +374,7 @@ static const luaL_Reg module_functions[] = {
 	{"crossTypeCompare", luaext_crossTypeCompare},
 	{"crossTypeSort", luaext_crossTypeSort},
 	{"empty", luaext_empty},
+	{"error_fmt", luaext_error_fmt},
 	{"printf", luaext_printf},
 	{"table_keyof", luaext_table_keyof},
 	{"table_keys", luaext_table_keys},
