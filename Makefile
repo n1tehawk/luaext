@@ -7,6 +7,8 @@ CFLAGS += -Wall -Werror $(LUA_INCDIR)
 
 LUAEXT_OBJS =  luaext_lib/luaext_lib.o
 LUAEXT_OBJS += luaext_lib/luaext_math.o
+LUAEXT_OBJS += luaext_lib/luaext_refs.o
+LUAEXT_OBJS += luaext_lib/luaext_table.o
 
 # platform specific rules:
 ARCH = $(shell uname -s)
