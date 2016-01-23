@@ -1,4 +1,5 @@
 [![License](http://img.shields.io/badge/License-MIT-green.svg)](#license)
+[![Build Status](https://travis-ci.org/n1tehawk/luaext.svg?branch=master)](https://travis-ci.org/n1tehawk/luaext)
 
 # luaext
 
