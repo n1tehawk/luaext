@@ -8,8 +8,18 @@ local test_configurations = {
 	},
 	{
 		EXPORT_MODULE_AS_GLOBAL = true,
+		EXPORT_GLOBAL_FUNCTIONS = true,
+		USE_LUA_NAMESPACES = false,
+	},
+	{
+		EXPORT_MODULE_AS_GLOBAL = true,
 		EXPORT_GLOBAL_FUNCTIONS = false,
 		USE_LUA_NAMESPACES = true,
+	},
+	{
+		EXPORT_MODULE_AS_GLOBAL = true,
+		EXPORT_GLOBAL_FUNCTIONS = false,
+		USE_LUA_NAMESPACES = false,
 	},
 	{
 		EXPORT_MODULE_AS_GLOBAL = false,
@@ -18,8 +28,18 @@ local test_configurations = {
 	},
 	{
 		EXPORT_MODULE_AS_GLOBAL = false,
+		EXPORT_GLOBAL_FUNCTIONS = true,
+		USE_LUA_NAMESPACES = false,
+	},
+	{
+		EXPORT_MODULE_AS_GLOBAL = false,
 		EXPORT_GLOBAL_FUNCTIONS = false,
 		USE_LUA_NAMESPACES = true,
+	},
+	{
+		EXPORT_MODULE_AS_GLOBAL = false,
+		EXPORT_GLOBAL_FUNCTIONS = false,
+		USE_LUA_NAMESPACES = false,
 	},
 }
 
@@ -39,6 +59,7 @@ end
 
 -- import the various test cases
 dofile("tests/test_luaext.lua")
+dofile("tests/test_table.lua")
 
 -- and finally run them all
 lu.LuaUnit.run()

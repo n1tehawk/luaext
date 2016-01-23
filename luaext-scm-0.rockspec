@@ -23,6 +23,7 @@ build = {
 	type = "builtin",
 	modules = {
 		luaext_lib = "luaext_lib/luaext_lib.c",
-		luaext = "luaext.lua",
+		luaext           = "luaext.lua",
+		["luaext.table"] = "luaext/table.lua",
 	}
 }

@@ -49,10 +49,10 @@ matrix: $(LUAEXT_LIB)
 	@MATRIX_CONFIG=2 $(LUA) tests/test.lua -v
 	@MATRIX_CONFIG=3 $(LUA) tests/test.lua -v
 	@MATRIX_CONFIG=4 $(LUA) tests/test.lua -v
-	#@MATRIX_CONFIG=5 $(LUA) tests/test.lua -v
-	#@MATRIX_CONFIG=6 $(LUA) tests/test.lua -v
-	#@MATRIX_CONFIG=7 $(LUA) tests/test.lua -v
-	#@MATRIX_CONFIG=8 $(LUA) tests/test.lua -v
+	@MATRIX_CONFIG=5 $(LUA) tests/test.lua -v
+	@MATRIX_CONFIG=6 $(LUA) tests/test.lua -v
+	@MATRIX_CONFIG=7 $(LUA) tests/test.lua -v
+	@MATRIX_CONFIG=8 $(LUA) tests/test.lua -v
 
 clean:
 	rm -f $(LUAEXT_LIB) luaext_lib/*.o
