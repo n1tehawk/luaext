@@ -59,6 +59,7 @@ end
 
 -- import the various test cases
 dofile("tests/test_luaext.lua")
+dofile("tests/test_math.lua")
 dofile("tests/test_table.lua")
 
 -- and finally run them all

@@ -22,8 +22,12 @@ dependencies = {
 build = {
 	type = "builtin",
 	modules = {
-		luaext_lib = "luaext_lib/luaext_lib.c",
+		luaext_lib = {
+			"luaext_lib/luaext_lib.c",
+			"luaext_lib/luaext_math.c",
+		},
 		luaext           = "luaext.lua",
+		["luaext.math"]  = "luaext/math.lua",
 		["luaext.table"] = "luaext/table.lua",
 	}
 }

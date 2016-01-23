@@ -5,6 +5,9 @@
 LUA ?= lua
 CFLAGS += -Wall -Werror $(LUA_INCDIR)
 
+LUAEXT_OBJS =  luaext_lib/luaext_lib.o
+LUAEXT_OBJS += luaext_lib/luaext_math.o
+
 # platform specific rules:
 ARCH = $(shell uname -s)
 ifeq ($(ARCH),Linux)
@@ -31,7 +34,7 @@ else
   endif
 endif
 
-$(LUAEXT_LIB): luaext_lib/luaext_lib.o
+$(LUAEXT_LIB): $(LUAEXT_OBJS)
 	$(CC) -o $@ $(LFLAGS) $^ $(LIBS)
 
 test: $(LUAEXT_LIB)

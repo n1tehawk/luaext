@@ -9,7 +9,7 @@ _M._config = rawget(_G, "LUAEXT_CONFIG") or {
 
 -- which submodules to load (normally you'd want them all)
 -- local submodules = {"math", "string", "table"},
-local submodules = {"table"}
+local submodules = {"math", "table"}
 
 -- retrieve the low-level C module and import all its functions to this module
 -- TODO: we might have to be more strict about this (ignore submodule functions)

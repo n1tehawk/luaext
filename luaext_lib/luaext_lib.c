@@ -3,6 +3,7 @@
  * A C module with low-level functions for luaext
  */
 #include "luaext_lib.h"
+#include "luaext_math.h"
 
 #include "lauxlib.h"
 #include "luacompat.h"
@@ -375,6 +376,7 @@ static const luaL_Reg module_functions[] = {
 	{"crossTypeSort", luaext_crossTypeSort},
 	{"empty", luaext_empty},
 	{"error_fmt", luaext_error_fmt},
+	{"math_trunc", luaext_math_trunc},
 	{"printf", luaext_printf},
 	{"table_keyof", luaext_table_keyof},
 	{"table_keys", luaext_table_keys},
