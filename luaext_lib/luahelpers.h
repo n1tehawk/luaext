@@ -8,11 +8,12 @@
 #define LUAHELPERS_H
 
 // a macro for proper Lua CFunction declarations
-#ifndef __cdecl
-# define __cdecl __attribute__((__cdecl__))
-#endif
 #ifndef LUA_CFUNC
-# define LUA_CFUNC(fname)	int __cdecl fname(lua_State *L)
+# ifdef __cdecl
+#  define LUA_CFUNC(fname)	int __cdecl fname(lua_State *L)
+# else
+#  define LUA_CFUNC(fname)	int fname(lua_State *L)
+# endif
 #endif
 
 
