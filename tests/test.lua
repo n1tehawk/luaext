@@ -57,9 +57,10 @@ if config then
 	end
 end
 
--- import the various test cases
+-- set up / import the various test classes
 dofile("tests/test_luaext.lua")
 dofile("tests/test_math.lua")
+dofile("tests/test_string.lua")
 dofile("tests/test_table.lua")
 
 -- and finally run them all

@@ -127,3 +127,8 @@ function TestLuaExt:test_empty()
 
 	test_global("empty")
 end
+
+function TestLuaExt:test_globals()
+	-- functions not exported / tested otherwise, but possibly expected "global"
+	test_global("lua_escape_pattern")
+end

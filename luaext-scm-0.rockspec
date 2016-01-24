@@ -26,6 +26,7 @@ build = {
 			"luaext_lib/luaext_lib.c",
 			"luaext_lib/luaext_math.c",
 			"luaext_lib/luaext_refs.c",
+			"luaext_lib/luaext_string.c",
 			"luaext_lib/luaext_table.c",
 		},
 		luaext           = "luaext.lua",

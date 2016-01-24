@@ -5,13 +5,13 @@
 #include "luaext_lib.h"
 #include "luaext_math.h"
 #include "luaext_refs.h"
+#include "luaext_string.h"
 #include "luaext_table.h"
 
 #include "lauxlib.h"
 #include "luacompat.h"
 #include <string.h>
 
-/* General / "global" functions */
 
 // C-style printf, an equivalent to print(string.format(...))
 LUA_CFUNC(luaext_printf) {
@@ -192,13 +192,6 @@ LUA_CFUNC(luaext_crossTypeSort) {
 	return 1;
 }
 
-/* Math */
-
-/* Strings */
-
-
-
-/* (luaext_lib) module */
 
 // the list of module functions to export
 static const luaL_Reg module_functions[] = {
@@ -206,6 +199,7 @@ static const luaL_Reg module_functions[] = {
 	{"crossTypeSort", luaext_crossTypeSort},
 	{"empty", luaext_empty},
 	{"error_fmt", luaext_error_fmt},
+	{"lua_escape_pattern", luaext_escape_pattern},
 	{"math_trunc", luaext_math_trunc},
 	{"printf", luaext_printf},
 	{"table_keyof", luaext_table_keyof},
@@ -214,7 +208,7 @@ static const luaL_Reg module_functions[] = {
 };
 
 LUA_CFUNC(luaopen_luaext_lib) {
-	luaext_create_refs(L);
+	luaext_create_refs(L); // create references for some frequently used funcs
 	luaL_newlib(L, module_functions);
 	return 1;
 }
