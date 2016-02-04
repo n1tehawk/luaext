@@ -68,3 +68,8 @@ luajit:
 
 rockspec: # build from rockspec
 	luarocks make luaext-scm-0.rockspec
+
+# generate documentation (requires LDoc)
+.PHONY: doc
+doc:
+	ldoc -c .ldoc/config.ld .

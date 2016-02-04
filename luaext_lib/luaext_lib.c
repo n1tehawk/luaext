@@ -2,6 +2,7 @@
  * luaext_lib.c
  * A C module with low-level functions for luaext
  */
+/// @module luaext
 #include "luaext_lib.h"
 #include "luaext_math.h"
 #include "luaext_refs.h"
@@ -13,7 +14,16 @@
 #include <string.h>
 
 
-// C-style printf, an equivalent to print(string.format(...))
+/** C-style printf, an equivalent to `print(string.format(...))`.
+<br>Note:
+`printf(nil)` will simply output an empty line, just like `print()` would do.
+
+@function printf
+@tparam string fmt Formatting string, see `string.format`
+@param ... (Any additional varargs will be passed through to string.format)
+@usage
+printf("answer = %d", 42)
+*/
 LUA_CFUNC(luaext_printf) {
 	int nargs = lua_gettop(L);
 	if (nargs > 0) {
@@ -30,9 +40,32 @@ LUA_CFUNC(luaext_printf) {
 	return 0;
 }
 
-// printf-style error:
-// error_fmt(level, fmt, ...) is equivalent to error(string.format(fmt, ...), level)
-// level is optional, with error_fmt(fmt, ...) implemented as error_fmt(1, fmt, ...)
+/** printf-style error() function.
+`error_fmt(level, fmt, ...)` is equivalent to `error(string.format(fmt, ...), level)`
+
+@usage
+function bar(level)
+	if level then
+		error_fmt(level, "%s went wrong.", "Something")
+	else
+		error_fmt("%s went wrong.", "Something")
+	end
+end
+function foo(level)
+	bar(level)
+end
+
+foo()  -- will report error position with default level = within bar()
+foo(2) -- will report error position within foo()
+
+@function error_fmt
+@tparam number level Error position (nesting level) to report, see description
+of standard Lua `error()`.
+<br>Note: `level` is optional, with `error_fmt(fmt, ...)` implemented as
+`error_fmt(1, fmt, ...)`.
+@tparam string fmt Formatting string, see `string.format`
+@param ... (any additional varargs will be passed through to string.format)
+*/
 LUA_CFUNC(luaext_error_fmt) {
 	int level = 1; // default error level (report position within current chunk)
 	switch (lua_type(L, 1)) {
