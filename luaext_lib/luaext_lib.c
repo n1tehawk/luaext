@@ -233,6 +233,7 @@ static const luaL_Reg module_functions[] = {
 	{"empty", luaext_empty},
 	{"error_fmt", luaext_error_fmt},
 	{"lua_escape_pattern", luaext_escape_pattern},
+	{"math_frac", luaext_math_frac},
 	{"math_trunc", luaext_math_trunc},
 	{"printf", luaext_printf},
 	{"table_keyof", luaext_table_keyof},

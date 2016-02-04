@@ -1,4 +1,5 @@
 local lu = require("tests.luaunit")
+require("os")
 
 local test_configurations = {
 	{
@@ -63,5 +64,5 @@ dofile("tests/test_math.lua")
 dofile("tests/test_string.lua")
 dofile("tests/test_table.lua")
 
--- and finally run them all
-lu.LuaUnit.run()
+-- and finally run them all, returning an appropriate exit code
+os.exit(lu.LuaUnit.run())
