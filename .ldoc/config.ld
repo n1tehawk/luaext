@@ -19,6 +19,7 @@ dependent, see the module description for further details.)
 -- files to process
 file = {
 	"../luaext.lua",
+	"../luaext/",
 	"../luaext_lib/",
 }
 

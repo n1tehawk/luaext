@@ -5,7 +5,7 @@ The luaext core module.
 Usually all you need to do is a
 	require("luaext")
 from your project. With the default [configuration](#_config), this creates a
-global variable `luaext` (holding the module table), and also includes the
+global variable` luaext` (holding the module table), and also includes the
 various submodules.
 
 If you prefer less 'intrusive' operation, you may change the configuration
