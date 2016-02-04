@@ -16,7 +16,8 @@ in C, while other additions are written in Lua.
 
 ## Documentation
 
-(To be done... probably will be LDoc-based)
+LDoc-based [reference documentation](http://rawgit.com/n1tehawk/luaext/master/doc/luaext.html)
+is available in the `doc/` directory.
 
 
 ## Usage example
