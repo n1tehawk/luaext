@@ -1,0 +1,173 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>luaext reference</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>luaext</h1>
+
+<ul>
+  <li><a href="../luaext.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="$(kind=='Topics' and '' or 'nowrap'">
+  <li><a href="../modules/luaext.html">luaext</a></li>
+  <li><a href="../modules/luaext.math.html">luaext.math</a></li>
+  <li><strong>luaext.string</strong></li>
+  <li><a href="../modules/luaext.table.html">luaext.table</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>luaext.string</code></h1>
+<p>String functions.</p>
+<p> This file is part of the <em>luaext</em> library.</p>
+
+<p>If <code>USE_LUA_NAMESPACES</code> is <a href="luaext.html#_config">configured</a>, the module
+functions will also get exported to the standard<code> string</code> namespace.</p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#center">center (str, width, fillChar, pad_left, pad_right)</a></td>
+	<td class="summary">center a string, filling in chars up to a given width.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#escape_lua_pattern">escape_lua_pattern (str)</a></td>
+	<td class="summary">Escape a string so it can safely be used as a Lua pattern without triggering
+special semantics.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "center"></a>
+    <strong>center (str, width, fillChar, pad_left, pad_right)</strong>
+    </dt>
+    <dd>
+    center a string, filling in chars up to a given width.
+The function will first extend the given string by prepending <code>pad_left</code> and
+appending <code>pad_right</code>, respectively. After that, if the string length is still
+smaller than <code>width</code>, it will add a suitable amount of <code>fillChar</code> characters,
+so that the string is kept centered, and the result ends up with the requested
+<code>width</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         the string to process
+        </li>
+        <li><span class="parameter">width</span>
+            <span class="types"><span class="type">number</span></span>
+         the desired length (number of characters) for the result
+        </li>
+        <li><span class="parameter">fillChar</span>
+            <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         character to use when filling up the string to the
+final (centered) result. defaults to space (&ldquo; &rdquo;)
+        </li>
+        <li><span class="parameter">pad_left</span>
+            <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         will be prepended to string before <code>fillChar</code> gets
+applied. defaults to empty string (&ldquo;&rdquo;)
+        </li>
+        <li><span class="parameter">pad_right</span>
+            <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         will be appended to string before <code>fillChar</code> gets
+applied. defaults to <code>pad_left</code>
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">
+<span class="global">print</span>(<span class="string">"|"</span> .. luaext.<span class="global">string</span>.center(<span class="string">"--&gt; center &lt;--"</span>, <span class="number">30</span>)          .. <span class="string">"|"</span>)
+<span class="global">print</span>(<span class="string">"|"</span> .. luaext.<span class="global">string</span>.center(<span class="string">"center"</span>, <span class="number">30</span>, <span class="string">"-"</span>, <span class="string">"&gt; "</span>, <span class="string">" &lt;"</span>) .. <span class="string">"|"</span>)
+<span class="global">print</span>(<span class="string">"|"</span> .. luaext.<span class="global">string</span>.center(<span class="string">"Bruce Banner"</span>, <span class="number">30</span>, <span class="string">"*"</span>, <span class="string">" "</span>)  .. <span class="string">"|"</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "escape_lua_pattern"></a>
+    <strong>escape_lua_pattern (str)</strong>
+    </dt>
+    <dd>
+    Escape a string so it can safely be used as a Lua pattern without triggering
+special semantics.
+<br>This means prepending any &ldquo;magic&rdquo; character <code>^$()%.[]*+&ndash;?</code> with a percent
+sign. For Lua 5.1 we also escape embedded <code>NUL</code> chars to <code>%z</code> (see the
+<a href="http://www.lua.org/manual/5.1/manual.html#5.4.1">Patterns</a> section in the
+Lua manual).
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         the string to convert
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">
+<span class="global">assert</span>(luaext.<span class="global">string</span>.lua_escape_pattern(<span class="string">"(foo-bar)"</span>) == <span class="string">"%(foo%-bar%)"</span>)</pre>
+    </ul>
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.3</a></i>
+<i style="float:right;">Last updated 2016-02-05 12:45:43 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
