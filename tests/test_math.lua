@@ -1,17 +1,23 @@
 -- test luaext math functions using LuaUnit framework
 local lu = require("tests.luaunit")
 local luaext = require("luaext")
-require("math") -- (for checking namespace)
 
 TestMath = {}
 
 function TestMath:test_namespace()
+	local namespace = "math"
+	local funcs = {"frac", "round", "trunc"}
+
 	-- check namespace compliance
-	for _, func in ipairs({"frac", "round", "trunc"}) do
+	local module = require(namespace)
+	for _, func in ipairs(funcs) do
 		if luaext._config.USE_LUA_NAMESPACES then
-			lu.assertEquals(math[func], luaext.math[func])
+			if not module[func] then
+				luaext.error_fmt("Expected function %s.%s NOT FOUND", namespace, func)
+			end
+			lu.assertEquals(module[func], luaext.math[func])
 		else
-			lu.assertNil(math[func])
+			lu.assertNil(module[func])
 		end
 	end
 end

@@ -43,7 +43,7 @@ _M._config = rawget(_G, "LUAEXT_CONFIG") or {
 
 -- which submodules to load (normally you'd want them all)
 -- local submodules = {"math", "string", "table"},
-local submodules = {"math", "table"}
+local submodules = {"math", "string", "table"}
 
 -- retrieve the low-level C module and import all its functions to this module
 -- TODO: we might have to be more strict about this (ignore submodule functions)
@@ -56,9 +56,13 @@ end
 
 -- import all the (Lua) submodules
 for _, submodule in ipairs(submodules) do
-	_M[submodule] = require("luaext." .. submodule)
+	local module = require("luaext." .. submodule)
+	_M[submodule] = module
 	if _M._config.USE_LUA_NAMESPACES then
-		_M[submodule].register_to_Lua()
+		module.register_to_Lua() -- register to Lua namespaces
+	end
+	if _M._config.EXPORT_GLOBAL_FUNCTIONS and module.register_globals then
+		module.register_globals() -- (optionally) register globals
 	end
 end
 
@@ -68,8 +72,11 @@ end
 if _M._config.EXPORT_GLOBAL_FUNCTIONS then
 	-- export specific functions to the global namespace
 	for _, func in ipairs(
-		{"empty", "error_fmt", "lua_escape_pattern", "printf"}
+		{"empty", "error_fmt", "printf"}
 	) do
+		if not _M[func] then
+			luaext_lib.error_fmt('FAILED to export "%s": no such function', func)
+		end
 		_G[func] = _M[func]
 	end
 end

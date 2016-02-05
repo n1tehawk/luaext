@@ -232,10 +232,10 @@ static const luaL_Reg module_functions[] = {
 	{"crossTypeSort", luaext_crossTypeSort},
 	{"empty", luaext_empty},
 	{"error_fmt", luaext_error_fmt},
-	{"lua_escape_pattern", luaext_escape_pattern},
 	{"math_frac", luaext_math_frac},
 	{"math_trunc", luaext_math_trunc},
 	{"printf", luaext_printf},
+	{"string_escape_lua_pattern", luaext_string_escape_lua_pattern},
 	{"table_keyof", luaext_table_keyof},
 	{"table_keys", luaext_table_keys},
 	{NULL, NULL}
